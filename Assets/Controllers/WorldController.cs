@@ -52,4 +52,11 @@ public class WorldController : MonoBehaviour {
             Debug.LogError("OnTileTypeChanged: Invalid tile type.");
         }
     }
+    
+    public Tile GetTileAtCoords(Vector3 coords) {
+        int x = Mathf.FloorToInt(coords.x);
+        int y = Mathf.FloorToInt(coords.y);
+
+        return World.GetTileAt(x, y);
+    }
 }

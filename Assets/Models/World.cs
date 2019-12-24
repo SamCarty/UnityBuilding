@@ -17,7 +17,7 @@ public class World {
         this.width = width;
         this.height = height;
 
-        tiles = new Tile[width, height];
+        tiles = new Tile[width + 1, height + 1];
 
         // Loop through for height and width to create array of tiles.
         for (int x = 0; x < width; x++) {

@@ -4,24 +4,37 @@ using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 
 public class MouseController : MonoBehaviour {
-    public GameObject cursor;
+    public GameObject cursorPrefab;
 
     Camera camera;
     Vector3 lastFramePos;
+    Vector3 currentFramePos;
+    
     Vector3 dragStartPos;
+    List<GameObject> dragPreviewObjects;
 
     // Start is called before the first frame update
     void Start() {
         camera = Camera.main;
+        dragPreviewObjects = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update() {
-        Vector3 currentFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
+        currentFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
         currentFramePos.z = 0;
 
+        //UpdateCursor();
+        UpdateTileDragging();
+        UpdateCameraMovement();
+        
+        lastFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
+        lastFramePos.z = 0;
+    }
+
+/*    void UpdateCursor() {
         // Update the cursor position
-        Tile tileUnderCursor = GetTileAtCoords(currentFramePos);
+        Tile tileUnderCursor = WorldController.Instance.GetTileAtCoords(currentFramePos);
         if (tileUnderCursor != null) {
             cursor.SetActive(true);
             Vector3 cursorPos = new Vector3(tileUnderCursor.X, tileUnderCursor.Y);
@@ -30,32 +43,50 @@ public class MouseController : MonoBehaviour {
         else {
             cursor.SetActive(false);
         }
+    }*/
 
+    void UpdateTileDragging() {
         // Start left button drag
         if (Input.GetMouseButtonDown(0)) {
             dragStartPos = currentFramePos;
         }
 
+        int startX = Mathf.FloorToInt(dragStartPos.x);
+        int endX = Mathf.FloorToInt(currentFramePos.x);
+        // Flip coords if they are wrong way round to avoid negatives in loop.
+        if (startX > endX) {
+            int temp = endX;
+            endX = startX;
+            startX = temp;
+        }
+
+        int startY = Mathf.FloorToInt(dragStartPos.y);
+        int endY = Mathf.FloorToInt(currentFramePos.y);
+        // Flip coords if they are wrong way round to avoid negatives in loop.
+        if (startY > endY) {
+            int temp = endY;
+            endY = startY;
+            startY = temp;
+        }
+
+        dragPreviewObjects.ForEach(obj => SimplePool.Despawn(obj));
+        dragPreviewObjects.Clear();
+        
+        // While mouse button is held down, display preview of the drag area.
+        if (Input.GetMouseButton(0)) {
+            for (int x = startX; x <= endX; x++) {
+                for (int y = startY; y <= endY; y++) {
+                    Tile tile = WorldController.Instance.World.GetTileAt(x, y);
+                    if (tile != null) {
+                        GameObject gameObject = SimplePool.Spawn(cursorPrefab, new Vector3(x, y, 0), Quaternion.identity);
+                        dragPreviewObjects.Add(gameObject);
+                    }
+                }
+            }
+        }
+
         // End left button drag
         if (Input.GetMouseButtonUp(0)) {
-            int startX = Mathf.FloorToInt(dragStartPos.x);
-            int endX = Mathf.FloorToInt(currentFramePos.x);
-            // Flip coords if they are wrong way round to avoid negatives in loop.
-            if (startX > endX) {
-                int temp = endX;
-                endX = startX;
-                startX = temp;
-            }
-
-            int startY = Mathf.FloorToInt(dragStartPos.y);
-            int endY = Mathf.FloorToInt(currentFramePos.y);
-            // Flip coords if they are wrong way round to avoid negatives in loop.
-            if (startY > endY) {
-                int temp = endY;
-                endY = startY;
-                startY = temp;
-            }
-
             // Loop through all the tiles in the selection and change their type.
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
@@ -64,21 +95,17 @@ public class MouseController : MonoBehaviour {
                 }
             }
         }
+    }
 
+    void UpdateCameraMovement() {
         // Drag camera around the scene.
         if (Input.GetMouseButton(1)) {
             Vector3 diff = lastFramePos - currentFramePos;
             camera.transform.Translate(diff);
         }
 
-        lastFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
-        lastFramePos.z = 0;
-    }
+        camera.orthographicSize -= camera.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
 
-    Tile GetTileAtCoords(Vector3 coords) {
-        int x = Mathf.FloorToInt(coords.x);
-        int y = Mathf.FloorToInt(coords.y);
-
-        return WorldController.Instance.World.GetTileAt(x, y);
+        camera.orthographicSize = Mathf.Clamp(camera.orthographicSize, 3f, 30f);
     }
 }
