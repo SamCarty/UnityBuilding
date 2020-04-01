@@ -5,12 +5,14 @@ using UnityEngine.EventSystems;
 public class MouseController : MonoBehaviour {
     public GameObject cursorPrefab;
 
-    Tile.TileType buildModeTile = Tile.TileType.Floor;
+    bool buildModeIsObjects = false;
+    InstalledObjectType buildModeInstalledObjectType;
+    TileType buildModeTile = TileType.Floor;
 
     Camera camera;
     Vector3 lastFramePos;
     Vector3 currentFramePos;
-    
+
     Vector3 dragStartPos;
     List<GameObject> dragPreviewObjects;
 
@@ -25,10 +27,9 @@ public class MouseController : MonoBehaviour {
         currentFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
         currentFramePos.z = 0;
 
-        //UpdateCursor();
         UpdateTileDragging();
         UpdateCameraMovement();
-        
+
         lastFramePos = camera.ScreenToWorldPoint(Input.mousePosition);
         lastFramePos.z = 0;
     }
@@ -36,7 +37,7 @@ public class MouseController : MonoBehaviour {
     void UpdateTileDragging() {
         // If mouse is over a user element, do nothing!
         if (EventSystem.current.IsPointerOverGameObject()) return;
-        
+
         // Start left button drag
         if (Input.GetMouseButtonDown(0)) {
             dragStartPos = currentFramePos;
@@ -86,10 +87,20 @@ public class MouseController : MonoBehaviour {
             // Loop through all the tiles in the selection and change their type.
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
+                    // Checks tile is in range.
                     if (x >= 0 && y >= 0) {
-                        // Checks tile is in range.
                         Tile tile = WorldController.Instance.World.GetTileAt(x, y);
-                        if (tile != null) tile.Type = buildModeTile;
+
+                        if (buildModeIsObjects) {
+                            // Create the InstalledObject and assign it to the designated Tile.
+
+                            // TODO: Right now, we assume walls!
+                            WorldController.Instance.World.PlaceInstalledObject(buildModeInstalledObjectType, tile);
+                        }
+                        else {
+                            // We are in Tile changing mode, not object mode.
+                            if (tile != null) tile.Type = buildModeTile;
+                        }
                     }
                 }
             }
@@ -109,10 +120,28 @@ public class MouseController : MonoBehaviour {
     }
 
     public void SetModeBuildFoundation() {
-        buildModeTile = Tile.TileType.Floor;
+        buildModeTile = TileType.Floor;
+        buildModeIsObjects = false;
+    }
+
+    public void SetModeBuildInstalledObject(string type) {
+        // Wall is not a TileType, it is an InstalledObject!
+        buildModeIsObjects = true;
+
+        // Try and get the Enum ObjectType from the passed in string (workaround as Unity does not allow Enums to be
+        // passed into script methods from the editor.
+        try {
+            InstalledObjectType objectType = (InstalledObjectType) System.Enum.Parse(typeof(InstalledObjectType), type);
+            buildModeInstalledObjectType = objectType;
+        }
+        catch (System.Exception) {
+            Debug.LogError("MouseController - Parse cannot convert the ObjectType string to an Enum, " +
+                           "check the spelling.");
+        }
     }
 
     public void SetModeBulldoze() {
-        buildModeTile = Tile.TileType.Empty;
+        buildModeTile = TileType.Empty;
+        buildModeIsObjects = false;
     }
 }

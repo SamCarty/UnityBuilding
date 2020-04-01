@@ -1,16 +1,16 @@
 ﻿using System;
+using UnityEngine;
 
+// The base type of a tile for example, grass or concrete.
+public enum TileType {
+    Empty,
+    Floor
+}
 public class Tile {
-    //The base type of a tile for example, grass or concrete.
-    public enum TileType {
-        Empty,
-        Floor
-    }
-
     TileType type = TileType.Empty; // Defaults to empty
 
     // Callback to handle what happens when the tile type is changed.
-    Action<Tile> tileTypeChangedCallback;
+    Action<Tile> cbTileTypeChanged;
 
     public TileType Type {
         get => type;
@@ -18,7 +18,7 @@ public class Tile {
             TileType oldType = type;
             type = value;
 
-            if (tileTypeChangedCallback != null && oldType != type) tileTypeChangedCallback?.Invoke(this);
+            if (cbTileTypeChanged != null && oldType != type) cbTileTypeChanged?.Invoke(this);
         }
     }
 
@@ -31,11 +31,8 @@ public class Tile {
     // The world that owns this tile.
     World world;
 
-    int x;
-    public int X => x;
-
-    int y;
-    public int Y => y;
+    public int x;
+    public int y;
     
     // Constructor
     public Tile(World world, int x, int y) {
@@ -43,12 +40,31 @@ public class Tile {
         this.x = x;
         this.y = y;
     }
-
-    public void RegisterTileTypeChangedCallback(Action<Tile> callback) {
-        tileTypeChangedCallback += callback;
+    
+    public void RegisterTileTypeChanged(Action<Tile> callback) {
+        cbTileTypeChanged += callback;
     }
 
-    public void UnregisterTileTypeChangedCallback(Action<Tile> callback) {
-        tileTypeChangedCallback -= callback;
+    public void UnregisterTileTypeChanged(Action<Tile> callback) {
+        cbTileTypeChanged -= callback;
+    }
+
+    /*
+     * Places an InstalledObject on this Tile.
+     */
+    public bool PlaceObject(InstalledObject installedObject) {
+        if (installedObject == null) {
+            // Uninstall
+            this.installedObject = null;
+            return true;
+        }
+
+        if (this.installedObject != null) {
+            Debug.LogError("Tile - Trying to place InstalledObject over an existing object.");
+            return false;
+        }
+
+        this.installedObject = installedObject;
+        return true;
     }
 }
