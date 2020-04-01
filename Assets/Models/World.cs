@@ -9,11 +9,8 @@ public class World {
 
     Dictionary<InstalledObjectType, InstalledObject> installedObjectPrototypes;
 
-    int width;
-    public int Width => width;
-
-    int height;
-    public int Height => height;
+    public int width;
+    public int height;
 
     Action<InstalledObject> cbInstalledObjectTypeChanged;
 
@@ -40,14 +37,14 @@ public class World {
         installedObjectPrototypes = new Dictionary<InstalledObjectType, InstalledObject>();
         installedObjectPrototypes.Add(InstalledObjectType.Wall, InstalledObject.CreatePrototype(
             InstalledObjectType.Wall, 
-            0, width: 1, height: 1));
+            0, true, width: 1, height: 1));
     }
 
     // Randomizes the tile type of each tile in the world.
     public void RandomizeTiles() {
         Debug.Log("Randomizing tiles...");
-        for (int x = 0; x < Width; x++) {
-            for (int y = 0; y < Height; y++) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 if (Random.Range(0, 2) == 0) {
                     tiles[x, y].Type = TileType.Empty;
                 }
@@ -60,7 +57,7 @@ public class World {
 
     // Returns the Tile object for a given coordinate.
     public Tile GetTileAt(int x, int y) {
-        if (x < 0 || x > Width || y < 0 || y > Height) {
+        if (x < 0 || x > width || y < 0 || y > height) {
             Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
             return null;
         }

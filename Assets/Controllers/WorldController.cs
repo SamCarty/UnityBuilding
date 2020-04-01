@@ -3,20 +3,29 @@ using System.Linq;
 using UnityEngine;
 
 public class WorldController : MonoBehaviour {
-
-    public Sprite wallSprite; // TODO: make dynamic based on the object needed!
-    public Sprite floorSprite; // TODO: make dynamic based on the object needed!
+    
+    [SerializeField] 
+    Sprite floorSprite; // TODO: make dynamic based on the object needed!
     
     public static WorldController Instance { get; private set; }
 
     Dictionary<Tile, GameObject> tileGameObjectMap;
     Dictionary<InstalledObject, GameObject> installedObjectGameObjectMap;
+
+    Dictionary<string, Sprite> installedObjectSprites;
     
     public World World { get; private set; }
     
-
     // Start is called before the first frame update.
     void Start() {
+
+        installedObjectSprites = new Dictionary<string, Sprite>();
+        
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/InstalledObjects/");
+        foreach (Sprite sprite in sprites) {
+            installedObjectSprites.Add(sprite.name, sprite);
+        }
+        
         if (Instance != null) {
             Debug.LogError("There should never be more than one WorldControllers!");
         }
@@ -33,8 +42,8 @@ public class WorldController : MonoBehaviour {
         installedObjectGameObjectMap = new Dictionary<InstalledObject, GameObject>();
 
         // Set properties of each tile.
-        for (int x = 0; x < World.Width; x++) {
-            for (int y = 0; y < World.Height; y++) {
+        for (int x = 0; x < World.width; x++) {
+            for (int y = 0; y < World.height; y++) {
                 Tile tileData = World.GetTileAt(x, y);
                 
                 GameObject tileObject = new GameObject();
@@ -138,7 +147,7 @@ public class WorldController : MonoBehaviour {
         installedObjectGameObject.AddComponent<SpriteRenderer>();
         switch (placedObject.installedObjectType) {
             case InstalledObjectType.Wall:
-                installedObjectGameObject.GetComponent<SpriteRenderer>().sprite = wallSprite;
+                installedObjectGameObject.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(placedObject);
                 break;
             default:
                 Debug.LogError("OnInstalledObjectPlaced - Invalid InstalledObject type.");
@@ -148,8 +157,61 @@ public class WorldController : MonoBehaviour {
         // Register the InstalledObject changed callback.
         placedObject.RegisterChanged(OnInstalledObjectChanged);
     }
-
+    
     void OnInstalledObjectChanged(InstalledObject installedObject) {
-        Debug.LogError("OnInstalledObjectPlaced - Not implemented!");
+        // Make sure the InstalledObject graphics are updated when an adjacent thing is added.
+        if (installedObjectGameObjectMap.TryGetValue(installedObject, out var obj)) {
+            obj.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(installedObject);
+        }
+        else {
+            Debug.LogError("OnInstalledObjectChanged - InstalledObject is not present in the " +
+                           "installedObjectsGameObjectMap.");
+        }
+    }
+
+    Sprite GetSpriteForInstalledObject(InstalledObject obj) {
+        // if the object does not link to the neighbour, just get the sprite by the ObjectType...
+        if (obj.linksToNeighbour == false) {
+            return installedObjectSprites[obj.installedObjectType.ToString()];
+        }
+        
+        // ...otherwise, the sprite will have a more complex name!
+        string spriteName = obj.installedObjectType + "_";
+        int x = obj.tile.x;
+        int y = obj.tile.y;
+
+        // Check the neighbouring tiles and append the 
+        Tile t;
+        t = World.GetTileAt(x, y + 1);
+        if (t != null && t.installedObject != null &&
+            t.installedObject.installedObjectType == obj.installedObjectType) {
+            spriteName += "N";
+        }
+        t = World.GetTileAt(x, y - 1);
+        if (t != null && t.installedObject != null &&
+            t.installedObject.installedObjectType == obj.installedObjectType) {
+            spriteName += "S";
+        }
+        t = World.GetTileAt(x + 1, y);
+        if (t != null && t.installedObject != null &&
+            t.installedObject.installedObjectType == obj.installedObjectType) {
+            spriteName += "E";
+        }
+        t = World.GetTileAt(x - 1, y);
+        if (t != null && t.installedObject != null &&
+            t.installedObject.installedObjectType == obj.installedObjectType) {
+            spriteName += "W";
+        }
+
+        if (installedObjectSprites.TryGetValue(spriteName, out var sprite)) {
+            return sprite;
+        }
+        else {
+            Debug.LogError("GetSpriteForInstalledObject - Sprite is not present in the installedObjectSprites " +
+                           "Map");
+            // TODO: return a default sprite
+            return null;
+        }
+        
     }
 }

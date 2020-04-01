@@ -26,10 +26,10 @@ public class Tile {
     LooseObject looseObject;
 
     // An object that is 'fixed' onto the tile. For example, a door or a chair.
-    InstalledObject installedObject;
+    public InstalledObject installedObject { get; protected set; }
 
     // The world that owns this tile.
-    World world;
+    public World world { get; protected set; }
 
     public int x;
     public int y;
