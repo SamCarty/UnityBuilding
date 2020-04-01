@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using Debug = System.Diagnostics.Debug;
+using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour {
     public GameObject cursorPrefab;
@@ -35,20 +33,10 @@ public class MouseController : MonoBehaviour {
         lastFramePos.z = 0;
     }
 
-/*    void UpdateCursor() {
-        // Update the cursor position
-        Tile tileUnderCursor = WorldController.Instance.GetTileAtCoords(currentFramePos);
-        if (tileUnderCursor != null) {
-            cursor.SetActive(true);
-            Vector3 cursorPos = new Vector3(tileUnderCursor.X, tileUnderCursor.Y);
-            cursor.transform.position = cursorPos;
-        }
-        else {
-            cursor.SetActive(false);
-        }
-    }*/
-
     void UpdateTileDragging() {
+        // If mouse is over a user element, do nothing!
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+        
         // Start left button drag
         if (Input.GetMouseButtonDown(0)) {
             dragStartPos = currentFramePos;
@@ -74,13 +62,14 @@ public class MouseController : MonoBehaviour {
 
         dragPreviewObjects.ForEach(obj => SimplePool.Despawn(obj));
         dragPreviewObjects.Clear();
-        
+
 
         // While mouse button is held down, display preview of the drag area.
         if (Input.GetMouseButton(0)) {
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    if (x >= 0 && y >= 0) { // Checks tile is in range.
+                    if (x >= 0 && y >= 0) {
+                        // Checks tile is in range.
                         Tile tile = WorldController.Instance.World.GetTileAt(x, y);
                         if (tile != null) {
                             GameObject gameObject =
@@ -91,12 +80,14 @@ public class MouseController : MonoBehaviour {
                 }
             }
         }
+
         // End left button drag
         if (Input.GetMouseButtonUp(0)) {
             // Loop through all the tiles in the selection and change their type.
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    if (x >= 0 && y >= 0) { // Checks tile is in range.
+                    if (x >= 0 && y >= 0) {
+                        // Checks tile is in range.
                         Tile tile = WorldController.Instance.World.GetTileAt(x, y);
                         if (tile != null) tile.Type = buildModeTile;
                     }

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using System;
 
 public class Tile {
     //The base type of a tile for example, grass or concrete.
@@ -39,7 +36,7 @@ public class Tile {
 
     int y;
     public int Y => y;
-
+    
     // Constructor
     public Tile(World world, int x, int y) {
         this.world = world;
@@ -51,7 +48,7 @@ public class Tile {
         tileTypeChangedCallback += callback;
     }
 
-    public void UnRegisterTileTypeChangedCallback(Action<Tile> callback) {
+    public void UnregisterTileTypeChangedCallback(Action<Tile> callback) {
         tileTypeChangedCallback -= callback;
     }
 }
