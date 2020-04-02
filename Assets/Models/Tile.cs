@@ -15,6 +15,7 @@ public abstract class Tile {
     public World world { get; protected set; }
     
     protected Sprite sprite;
+    private Action<Tile> cbTileTypeChanged;
 
     protected void CreateTile(World world, int x, int y, Sprite sprite) {
         this.world = world;
@@ -24,6 +25,7 @@ public abstract class Tile {
     }
 
     public Tile ChangeTileType(TileType tileType) {
+        
         Tile newTile;
         switch (tileType) {
             case TileType.Floor:
@@ -36,6 +38,7 @@ public abstract class Tile {
                 newTile = new Ground(this);
                 break;
         }
+        cbTileTypeChanged?.Invoke(this);
         return newTile;
     }
 
@@ -56,5 +59,13 @@ public abstract class Tile {
     public abstract void ChangeSprite(SpriteRenderer spriteRenderer);
 
     public abstract bool IsBuildonable();
+
+    public void RegisterTileTypeChangedCallback(Action<Tile> callback) {
+        cbTileTypeChanged += callback;
+    }
+
+    public void UnregisterTileTypeChangedCallback(Action<Tile> callback) {
+        cbTileTypeChanged -= callback;
+    }
 
 }

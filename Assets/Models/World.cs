@@ -12,7 +12,8 @@ public class World {
     public int width;
     public int height;
 
-    Action<InstalledObject> cbInstalledObjectTypeChanged;
+    Action<InstalledObject> cbInstalledObjectPlaced;
+    Action<Tile> cbTileTypeChanged;
 
     // Constructor
     public World(int width = 100, int height = 100) {
@@ -25,6 +26,7 @@ public class World {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 tiles[x, y] = new Ground(this, x, y);
+                tiles[x, y].RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
 
@@ -69,7 +71,7 @@ public class World {
         if (installedObjectPrototypes.TryGetValue(installedObjectType, out var installedObject)) {
             InstalledObject obj = installedObject.PlacePrototype(installedObject, tile);
             if (obj != null) {
-                cbInstalledObjectTypeChanged?.Invoke(obj);
+                cbInstalledObjectPlaced?.Invoke(obj);
             }
         }
         else {
@@ -78,12 +80,24 @@ public class World {
         }
     }
 
-    public void RegisterInstalledObjectTypeChanged(Action<InstalledObject> callback) {
-        cbInstalledObjectTypeChanged += callback;
+    public void RegisterInstalledObjectPlaced(Action<InstalledObject> callback) {
+        cbInstalledObjectPlaced += callback;
     }
 
-    public void UnregisterInstalledObjectTypeChanged(Action<InstalledObject> callback) {
-        cbInstalledObjectTypeChanged -= callback;
+    public void UnregisterInstalledObjectPlaced(Action<InstalledObject> callback) {
+        cbInstalledObjectPlaced -= callback;
+    }
+    
+    public void RegisterTileTypeChanged(Action<Tile> callback) {
+        cbTileTypeChanged += callback;
+    }
+
+    public void UnregisterTileTypeChanged(Action<Tile> callback) {
+        cbTileTypeChanged -= callback;
+    }
+    
+    private void OnTileTypeChanged(Tile tile) {
+        cbTileTypeChanged?.Invoke(tile);
     }
 
 }

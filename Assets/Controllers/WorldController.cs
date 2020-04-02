@@ -27,7 +27,7 @@ public class WorldController : MonoBehaviour {
 
         // Create world with empty tiles.
         world = new World();
-        world.RegisterInstalledObjectTypeChanged(OnInstalledObjectPlaced);
+        world.RegisterInstalledObjectPlaced(OnInstalledObjectPlaced);
 
         // Initialize map that tracks the GameObject that is representing the Tile data.
         tileGameObjectMap = new Dictionary<Tile, GameObject>();
