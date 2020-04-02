@@ -6,42 +6,30 @@ public enum TileType {
     Ground,
     Floor
 }
-public abstract class Tile {
+public class Tile {
     
     public int x;
     public int y;
     public LooseObject looseObject { get; protected set; }
     public InstalledObject installedObject { get; protected set; }
     public World world { get; protected set; }
-    
-    protected Sprite sprite;
-    public AudioClip placedAudio = Resources.Load<AudioClip>("Audio/Heavy_Impact");
-    
+
+    private TileType tt = TileType.Ground;
+    public TileType tileType {
+        get => tt;
+        set {
+            TileType oldType = tt;
+            tt = value;
+            if (cbTileTypeChanged != null && oldType != tt) cbTileTypeChanged?.Invoke(this);
+        }
+    }
+
     private Action<Tile> cbTileTypeChanged;
 
-    protected void CreateTile(World world, int x, int y, Sprite sprite) {
+    public Tile(World world, int x, int y) {
         this.world = world;
         this.x = x;
         this.y = y;
-        this.sprite = sprite;
-    }
-
-    public Tile ChangeTileType(TileType tileType) {
-        
-        Tile newTile;
-        switch (tileType) {
-            case TileType.Floor:
-                newTile = new Floor(this);
-                break;
-            case TileType.Ground:
-                newTile = new Ground(this);
-                break;
-            default:
-                newTile = new Ground(this);
-                break;
-        }
-        cbTileTypeChanged?.Invoke(this);
-        return newTile;
     }
 
     /*
@@ -57,10 +45,6 @@ public abstract class Tile {
         this.installedObject = installedObject;
         return true;
     }
-
-    public abstract void ChangeSprite(SpriteRenderer spriteRenderer);
-
-    public abstract bool IsBuildonable();
 
     public void RegisterTileTypeChangedCallback(Action<Tile> callback) {
         cbTileTypeChanged += callback;

@@ -25,7 +25,7 @@ public class World {
         // Loop through for height and width to create array of tiles.
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles[x, y] = new Ground(this, x, y);
+                tiles[x, y] = new Tile(this, x, y);
                 tiles[x, y].RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
@@ -37,7 +37,8 @@ public class World {
 
     void CreateInstalledObjectPrototypes() {
         installedObjectPrototypes = new Dictionary<InstalledObjectType, InstalledObject>();
-        installedObjectPrototypes.Add(InstalledObjectType.Wall, new Wall());
+        installedObjectPrototypes.Add(InstalledObjectType.Wall, InstalledObject.CreatePrototype(
+            InstalledObjectType.Wall, 0, true, width: 1, height: 1));
     }
 
     // Randomizes the tile type of each tile in the world.

@@ -24,7 +24,7 @@ public class AudioController : MonoBehaviour {
 
     void OnTileTypeChanged(Tile tile) {
         Debug.Log("Tile type changed.");
-        AudioClip audioClip = tile.placedAudio;
+        AudioClip audioClip = Resources.Load<AudioClip>("Audio/Heavy_Impact");
         PlaySound(audioClip, Camera.main.transform.position);
     }
 

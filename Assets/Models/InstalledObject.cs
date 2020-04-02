@@ -9,14 +9,12 @@ public enum InstalledObjectType {
     Wall
 }
 
-public abstract class InstalledObject {
+public class InstalledObject {
     // The base Tile of the InstalledObject. Large objects can occupy multiple Tiles.
     public Tile tile { get; protected set; }
 
     public InstalledObjectType installedObjectType { get; protected set; }
     
-    protected Dictionary<string, Sprite> objectSprites = new Dictionary<string, Sprite>();
-
     // Size of the InstalledObject
     private int width = 1;
     private int height = 1;
@@ -27,13 +25,13 @@ public abstract class InstalledObject {
 
     // Whether the InstalledObject connects to its neighbour (e.g. a wall for it's sprite to change.
     public bool linksToNeighbour { get; protected set; }
-
-
+    
     // Callback for when the status changes.
     Action<InstalledObject> cbChanged;
 
-    protected InstalledObject CreatePrototype(InstalledObject installedObject, float movementCost,
-        bool linksToNeighbour, int width, int height) {
+    public static InstalledObject CreatePrototype(InstalledObjectType installedObjectType, float movementCost, 
+        bool linksToNeighbour = false, int width = 1, int height = 1) {
+        InstalledObject installedObject = new InstalledObject();
         installedObject.installedObjectType = installedObjectType;
         installedObject.linksToNeighbour = linksToNeighbour;
         installedObject.width = width;
@@ -47,7 +45,7 @@ public abstract class InstalledObject {
             return null;
         }
         
-        InstalledObject installedObject = proto.GenerateNewInstalledObject();
+        InstalledObject installedObject = new InstalledObject();
         installedObject.installedObjectType = proto.installedObjectType;
         installedObject.linksToNeighbour = proto.linksToNeighbour;
         installedObject.width = proto.width;
@@ -96,10 +94,8 @@ public abstract class InstalledObject {
         return installedObject;
     }
 
-    protected abstract InstalledObject GenerateNewInstalledObject();
-
     public bool CheckPlacementValidity(Tile tile) {
-        if (!tile.IsBuildonable()) {
+        if (tile.tileType != TileType.Floor) {
             Debug.LogError("CheckPlacementValidity - Tried to place InstalledObject on area with no foundation.");
             return false;
         }
@@ -111,55 +107,7 @@ public abstract class InstalledObject {
 
         return true;
     }
-    
-    public abstract void ChangeSprite(SpriteRenderer spriteRenderer, World world);
 
-    protected Sprite GetSpriteForInstalledObject(World world, InstalledObject obj) {
-        // if the object does not link to the neighbour, just get the sprite by the ObjectType...
-        if (obj.linksToNeighbour == false) {
-            return objectSprites[obj.installedObjectType.ToString()];
-        }
-
-        // ...otherwise, the sprite will have a more complex name!
-        string spriteName = obj.installedObjectType + "_";
-        int x = obj.tile.x;
-        int y = obj.tile.y;
-
-        // Check the neighbouring tiles and append the corresponding NSEW value.
-        Tile t;
-        t = world.GetTileAt(x, y + 1);
-        if (t != null && t.installedObject != null &&
-            t.installedObject.installedObjectType == obj.installedObjectType) {
-            spriteName += "N";
-        }
-
-        t = world.GetTileAt(x, y - 1);
-        if (t != null && t.installedObject != null &&
-            t.installedObject.installedObjectType == obj.installedObjectType) {
-            spriteName += "S";
-        }
-
-        t = world.GetTileAt(x + 1, y);
-        if (t != null && t.installedObject != null &&
-            t.installedObject.installedObjectType == obj.installedObjectType) {
-            spriteName += "E";
-        }
-
-        t = world.GetTileAt(x - 1, y);
-        if (t != null && t.installedObject != null &&
-            t.installedObject.installedObjectType == obj.installedObjectType) {
-            spriteName += "W";
-        }
-
-        if (objectSprites.TryGetValue(spriteName, out var sprite)) {
-            return sprite;
-        }
-
-        Debug.LogError("GetSpriteForInstalledObject - Sprite is not present in the " +
-                       "installedObjectSprites map");
-        return objectSprites["Wall_"];
-    }
-    
     public void RegisterChanged(Action<InstalledObject> callback) {
         cbChanged += callback;
     }

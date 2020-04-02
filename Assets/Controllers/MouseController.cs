@@ -102,7 +102,7 @@ public class MouseController : MonoBehaviour {
                         }
                         else {
                             // We are in Tile changing mode, not object mode.
-                            if (tile != null) WorldController.instance.ChangeTileType(tile, buildModeTile);
+                            if (tile != null) tile.tileType = buildModeTile;
                         }
                     }
                 }
