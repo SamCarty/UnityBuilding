@@ -14,4 +14,7 @@ public class Floor: Tile {
         spriteRenderer.sortingLayerName = "Floor";
     }
 
+    public override bool IsBuildonable() {
+        return true;
+    }
 }

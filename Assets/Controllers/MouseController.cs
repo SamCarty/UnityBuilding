@@ -3,18 +3,21 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour {
-    public GameObject cursorPrefab;
+    // Build mode on and off
+    private bool buildModeIsObjects = false;
+    private InstalledObjectType buildModeInstalledObjectType;
+    private TileType buildModeTile = TileType.Floor;
 
-    bool buildModeIsObjects = false;
-    InstalledObjectType buildModeInstalledObjectType;
-    TileType buildModeTile = TileType.Floor;
+    // Camera
+    private Camera camera;
+    private Vector3 lastFramePos;
+    private Vector3 currentFramePos;
 
-    Camera camera;
-    Vector3 lastFramePos;
-    Vector3 currentFramePos;
-
-    Vector3 dragStartPos;
-    List<GameObject> dragPreviewObjects;
+    // Dragging to place Tiles/Objects
+    [SerializeField]
+    private GameObject cursorPrefab;
+    private Vector3 dragStartPos;
+    private List<GameObject> dragPreviewObjects;
 
     // Start is called before the first frame update
     void Start() {
@@ -71,11 +74,11 @@ public class MouseController : MonoBehaviour {
                 for (int y = startY; y <= endY; y++) {
                     if (x >= 0 && y >= 0) {
                         // Checks tile is in range.
-                        Tile tile = WorldController.Instance.World.GetTileAt(x, y);
+                        Tile tile = WorldController.instance.world.GetTileAt(x, y);
                         if (tile != null) {
-                            GameObject gameObject =
+                            GameObject cursorOverlayGameObject =
                                 SimplePool.Spawn(cursorPrefab, new Vector3(x, y, 0), Quaternion.identity);
-                            dragPreviewObjects.Add(gameObject);
+                            dragPreviewObjects.Add(cursorOverlayGameObject);
                         }
                     }
                 }
@@ -89,17 +92,17 @@ public class MouseController : MonoBehaviour {
                 for (int y = startY; y <= endY; y++) {
                     // Checks tile is in range.
                     if (x >= 0 && y >= 0) {
-                        Tile tile = WorldController.Instance.World.GetTileAt(x, y);
+                        Tile tile = WorldController.instance.world.GetTileAt(x, y);
 
                         if (buildModeIsObjects) {
                             // Create the InstalledObject and assign it to the designated Tile.
 
                             // TODO: Right now, we assume walls!
-                            WorldController.Instance.World.PlaceInstalledObject(buildModeInstalledObjectType, tile);
+                            WorldController.instance.world.PlaceInstalledObject(buildModeInstalledObjectType, tile);
                         }
                         else {
                             // We are in Tile changing mode, not object mode.
-                            if (tile != null) WorldController.Instance.ChangeTileType(tile, buildModeTile);
+                            if (tile != null) WorldController.instance.ChangeTileType(tile, buildModeTile);
                         }
                     }
                 }
@@ -115,7 +118,6 @@ public class MouseController : MonoBehaviour {
         }
 
         camera.orthographicSize -= camera.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
-
         camera.orthographicSize = Mathf.Clamp(camera.orthographicSize, 3f, 30f);
     }
 

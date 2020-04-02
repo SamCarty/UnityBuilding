@@ -8,8 +8,6 @@ public class Ground: Tile {
         foreach (Sprite sprite in sprites) {
             groundSprites.Add(sprite.name, sprite);
         }
-        
-        Debug.Log(groundSprites);
 
         CreateTile(world, x, y, groundSprites["Grass_A"]);
     }
@@ -20,9 +18,7 @@ public class Ground: Tile {
         foreach (Sprite sprite in sprites) {
             groundSprites.Add(sprite.name, sprite);
         }
-        
-        Debug.Log(groundSprites);
-        
+
         CreateTile(parent.world, parent.x, parent.y, groundSprites["Grass_A"]);
     }
     
@@ -30,5 +26,8 @@ public class Ground: Tile {
         spriteRenderer.sprite = sprite;
         spriteRenderer.sortingLayerName = "Ground";
     }
-    
+
+    public override bool IsBuildonable() {
+        return false;
+    }
 }

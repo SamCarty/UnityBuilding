@@ -67,7 +67,7 @@ public class World {
 
     public void PlaceInstalledObject(InstalledObjectType installedObjectType, Tile tile) {
         if (installedObjectPrototypes.TryGetValue(installedObjectType, out var installedObject)) {
-            InstalledObject obj = InstalledObject.PlacePrototype(installedObject, tile);
+            InstalledObject obj = installedObject.PlacePrototype(installedObject, tile);
             if (obj != null) {
                 cbInstalledObjectTypeChanged?.Invoke(obj);
             }

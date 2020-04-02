@@ -49,15 +49,12 @@ public abstract class Tile {
             return true;
         }
 
-        if (this.installedObject != null) {
-            Debug.LogError("Tile - Trying to place InstalledObject over an existing object.");
-            return false;
-        }
-
         this.installedObject = installedObject;
         return true;
     }
 
     public abstract void ChangeSprite(SpriteRenderer spriteRenderer);
+
+    public abstract bool IsBuildonable();
 
 }
