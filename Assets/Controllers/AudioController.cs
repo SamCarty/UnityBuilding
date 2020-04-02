@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AudioController : MonoBehaviour {
-    const float MAX_AUDIO_COOLDOWN = 0.1f;
-    float audioCooldown = 0.1f;
+    private const float MAX_AUDIO_COOLDOWN = 0.1f;
+    private float audioCooldown = 0.1f;
 
     void Start() {
         WorldController.instance.world.RegisterInstalledObjectPlaced(OnInstalledObjectCreated);
@@ -24,7 +24,7 @@ public class AudioController : MonoBehaviour {
 
     void OnTileTypeChanged(Tile tile) {
         Debug.Log("Tile type changed.");
-        AudioClip audioClip = Resources.Load<AudioClip>("Audio/Heavy_Impact");
+        AudioClip audioClip = tile.placedAudio;
         PlaySound(audioClip, Camera.main.transform.position);
     }
 

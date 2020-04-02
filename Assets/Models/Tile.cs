@@ -15,6 +15,8 @@ public abstract class Tile {
     public World world { get; protected set; }
     
     protected Sprite sprite;
+    public AudioClip placedAudio = Resources.Load<AudioClip>("Audio/Heavy_Impact");
+    
     private Action<Tile> cbTileTypeChanged;
 
     protected void CreateTile(World world, int x, int y, Sprite sprite) {
@@ -29,7 +31,7 @@ public abstract class Tile {
         Tile newTile;
         switch (tileType) {
             case TileType.Floor:
-                newTile =  new Floor(this);
+                newTile = new Floor(this);
                 break;
             case TileType.Ground:
                 newTile = new Ground(this);
