@@ -35,9 +35,7 @@ public class World {
 
     void CreateInstalledObjectPrototypes() {
         installedObjectPrototypes = new Dictionary<InstalledObjectType, InstalledObject>();
-        installedObjectPrototypes.Add(InstalledObjectType.Wall, InstalledObject.CreatePrototype(
-            InstalledObjectType.Wall, 
-            0, true, width: 1, height: 1));
+        installedObjectPrototypes.Add(InstalledObjectType.Wall, new Wall());
     }
 
     // Randomizes the tile type of each tile in the world.

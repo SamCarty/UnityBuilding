@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class WorldController : MonoBehaviour {
     
-    [SerializeField] 
-    Sprite floorSprite; // TODO: make dynamic based on the object needed!
+    [SerializeField] Sprite floorSprite; // TODO: make dynamic based on the object needed!
+    [SerializeField] Sprite emptySprite;
     
     public static WorldController Instance { get; private set; }
 
@@ -105,13 +105,16 @@ public class WorldController : MonoBehaviour {
                     "OnTileTypeChanged - Tile GameObject is null! Did you forget to bind the Tile and GameObject in the map?");
                 return;
             }
-
+            
+            SpriteRenderer spriteRenderer = tileObject.GetComponent<SpriteRenderer>();
             switch (tileData.Type) {
                 case TileType.Floor:
-                    tileObject.GetComponent<SpriteRenderer>().sprite = floorSprite;
+                    spriteRenderer.sprite = floorSprite;
+                    spriteRenderer.sortingLayerName = "Floor";
                     break;
                 case TileType.Empty:
-                    tileObject.GetComponent<SpriteRenderer>().sprite = null;
+                    spriteRenderer.sprite = emptySprite;
+                    spriteRenderer.sortingLayerName = "Ground";
                     break;
                 default:
                     Debug.LogError("OnTileTypeChanged - Invalid tile type.");
@@ -144,10 +147,11 @@ public class WorldController : MonoBehaviour {
         installedObjectGameObjectMap.Add(placedObject, installedObjectGameObject);
 
         // Add a SpriteRenderer to the InstalledObject.
-        installedObjectGameObject.AddComponent<SpriteRenderer>();
+        SpriteRenderer spriteRenderer = installedObjectGameObject.AddComponent<SpriteRenderer>();
         switch (placedObject.installedObjectType) {
             case InstalledObjectType.Wall:
-                installedObjectGameObject.GetComponent<SpriteRenderer>().sprite = GetSpriteForInstalledObject(placedObject);
+                spriteRenderer.sprite = GetSpriteForInstalledObject(placedObject);
+                spriteRenderer.sortingLayerName = "InstalledObject";
                 break;
             default:
                 Debug.LogError("OnInstalledObjectPlaced - Invalid InstalledObject type.");

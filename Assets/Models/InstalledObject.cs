@@ -10,29 +10,32 @@ public enum InstalledObjectType {
     Wall
 }
 
-// TODO: convert to inherited classes!!
-public class InstalledObject {
+public abstract class InstalledObject {
     // The base Tile of the InstalledObject. Large objects can occupy multiple Tiles.
     public Tile tile { get; protected set; }
+
     public InstalledObjectType installedObjectType { get; protected set; }
 
-    //A multiplier that determines the speed of movement. A value of '2' means you go twice as slow (half speed).
-    // If this is 0, the Tile is impassable! 
-    float movementCost = 1f;
-
-    public bool linksToNeighbour { get; protected set; }
-
+// Size of the InstalledObject
     int width = 1;
     int height = 1;
 
+    // A multiplier that determines the speed of movement. A value of '2' means you go twice as slow (half speed).
+    // If this is 0, the Tile is impassable! 
+    float movementCost = 1f;
+
+    // Whether the InstalledObject connects to its neighbour (e.g. a wall for it's sprite to change.
+    public bool linksToNeighbour { get; protected set; }
+
+
+    // Callback for when the status changes.
     Action<InstalledObject> cbChanged;
 
     protected InstalledObject() {
     }
 
-    public static InstalledObject CreatePrototype(InstalledObjectType installedObjectType, float movementCost, 
-        bool linksToNeighbour = false, int width = 1, int height = 1) {
-        InstalledObject installedObject = new InstalledObject();
+    protected InstalledObject CreatePrototype(InstalledObject installedObject, float movementCost,
+        bool linksToNeighbour, int width, int height) {
         installedObject.installedObjectType = installedObjectType;
         installedObject.linksToNeighbour = linksToNeighbour;
         installedObject.width = width;
@@ -42,14 +45,14 @@ public class InstalledObject {
     }
 
     public static InstalledObject PlacePrototype(InstalledObject proto, Tile tile) {
-        InstalledObject installedObject = new InstalledObject();
+        InstalledObject installedObject = proto.GenerateNewInstalledObject();
         installedObject.installedObjectType = proto.installedObjectType;
         installedObject.linksToNeighbour = proto.linksToNeighbour;
         installedObject.width = proto.width;
         installedObject.height = proto.height;
         installedObject.movementCost = proto.movementCost;
         installedObject.tile = tile;
-        
+
         // TODO: This assumes that the object is a 1x1 object.
         if (installedObject.tile.PlaceObject(installedObject) == false) {
             // If we can't place object here for some reason.
@@ -63,21 +66,26 @@ public class InstalledObject {
             int x = tile.x;
             int y = tile.y;
             
+            Debug.Log("Coords are: " + x + ", " +  y);
+
             t = tile.world.GetTileAt(x, y + 1);
             if (t != null && t.installedObject != null &&
                 t.installedObject.installedObjectType == installedObject.installedObjectType) {
                 t.installedObject.cbChanged(t.installedObject);
             }
+
             t = tile.world.GetTileAt(x, y - 1);
             if (t != null && t.installedObject != null &&
                 t.installedObject.installedObjectType == installedObject.installedObjectType) {
                 t.installedObject.cbChanged(t.installedObject);
             }
+
             t = tile.world.GetTileAt(x + 1, y);
             if (t != null && t.installedObject != null &&
                 t.installedObject.installedObjectType == installedObject.installedObjectType) {
                 t.installedObject.cbChanged(t.installedObject);
             }
+
             t = tile.world.GetTileAt(x - 1, y);
             if (t != null && t.installedObject != null &&
                 t.installedObject.installedObjectType == installedObject.installedObjectType) {
@@ -88,6 +96,8 @@ public class InstalledObject {
         return installedObject;
     }
 
+    protected abstract InstalledObject GenerateNewInstalledObject();
+
     public void RegisterChanged(Action<InstalledObject> callback) {
         cbChanged += callback;
     }
@@ -95,6 +105,4 @@ public class InstalledObject {
     public void UnregisterChanged(Action<InstalledObject> callback) {
         cbChanged -= callback;
     }
-    
-    
 }

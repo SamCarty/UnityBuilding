@@ -41,6 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: TileUI
-    uniqueID: 3709735169
+  - name: Ground
+    uniqueID: 3220596155
+    locked: 0
+  - name: Floor
+    uniqueID: 3064040265
+    locked: 0
+  - name: InstalledObject
+    uniqueID: 3623495625
+    locked: 0
+  - name: LooseObject
+    uniqueID: 2690075859
+    locked: 0
+  - name: UI
+    uniqueID: 1536328797
     locked: 0
