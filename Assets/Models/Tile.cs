@@ -3,50 +3,40 @@ using UnityEngine;
 
 // The base type of a tile for example, grass or concrete.
 public enum TileType {
-    Empty,
+    Ground,
     Floor
 }
-public class Tile {
-    TileType type = TileType.Empty; // Defaults to empty
-
-    // Callback to handle what happens when the tile type is changed.
-    Action<Tile> cbTileTypeChanged;
-
-    public TileType Type {
-        get => type;
-        set {
-            TileType oldType = type;
-            type = value;
-
-            if (cbTileTypeChanged != null && oldType != type) cbTileTypeChanged?.Invoke(this);
-        }
-    }
-
-    // An object that is 'placed' on the tile. For example, a piece of stone or a tool.
-    LooseObject looseObject;
-
-    // An object that is 'fixed' onto the tile. For example, a door or a chair.
-    public InstalledObject installedObject { get; protected set; }
-
-    // The world that owns this tile.
-    public World world { get; protected set; }
-
+public abstract class Tile {
+    
     public int x;
     public int y;
+    public LooseObject looseObject { get; protected set; }
+    public InstalledObject installedObject { get; protected set; }
+    public World world { get; protected set; }
     
-    // Constructor
-    public Tile(World world, int x, int y) {
+    protected Sprite sprite;
+
+    protected void CreateTile(World world, int x, int y, Sprite sprite) {
         this.world = world;
         this.x = x;
         this.y = y;
-    }
-    
-    public void RegisterTileTypeChanged(Action<Tile> callback) {
-        cbTileTypeChanged += callback;
+        this.sprite = sprite;
     }
 
-    public void UnregisterTileTypeChanged(Action<Tile> callback) {
-        cbTileTypeChanged -= callback;
+    public Tile ChangeTileType(TileType tileType) {
+        Tile newTile;
+        switch (tileType) {
+            case TileType.Floor:
+                newTile =  new Floor(this);
+                break;
+            case TileType.Ground:
+                newTile = new Ground(this);
+                break;
+            default:
+                newTile = new Ground(this);
+                break;
+        }
+        return newTile;
     }
 
     /*
@@ -67,4 +57,7 @@ public class Tile {
         this.installedObject = installedObject;
         return true;
     }
+
+    public abstract void ChangeSprite(SpriteRenderer spriteRenderer);
+
 }

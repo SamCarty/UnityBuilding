@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /*
@@ -30,9 +28,6 @@ public abstract class InstalledObject {
 
     // Callback for when the status changes.
     Action<InstalledObject> cbChanged;
-
-    protected InstalledObject() {
-    }
 
     protected InstalledObject CreatePrototype(InstalledObject installedObject, float movementCost,
         bool linksToNeighbour, int width, int height) {
@@ -65,8 +60,6 @@ public abstract class InstalledObject {
             Tile t;
             int x = tile.x;
             int y = tile.y;
-            
-            Debug.Log("Coords are: " + x + ", " +  y);
 
             t = tile.world.GetTileAt(x, y + 1);
             if (t != null && t.installedObject != null &&

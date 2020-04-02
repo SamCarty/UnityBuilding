@@ -893,9 +893,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51df553d93c20984a9f8227c63d00133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallSprite: {fileID: -171757232352120204, guid: 967e971356eb87c45b144dda99aa8350,
-    type: 3}
-  floorSprite: {fileID: 21300000, guid: 4e1dbc77d36294b4d90d7dbdd4d4c2b1, type: 3}
 --- !u!4 &1878594037
 Transform:
   m_ObjectHideFlags: 0

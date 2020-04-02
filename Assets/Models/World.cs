@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class World {
     // Array of all the tiles in the world.
-    Tile[,] tiles;
+    public Tile[,] tiles { get; protected set; }
 
     Dictionary<InstalledObjectType, InstalledObject> installedObjectPrototypes;
 
@@ -24,7 +24,7 @@ public class World {
         // Loop through for height and width to create array of tiles.
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles[x, y] = new Tile(this, x, y);
+                tiles[x, y] = new Ground(this, x, y);
             }
         }
 
@@ -39,12 +39,13 @@ public class World {
     }
 
     // Randomizes the tile type of each tile in the world.
+    /*
     public void RandomizeTiles() {
         Debug.Log("Randomizing tiles...");
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (Random.Range(0, 2) == 0) {
-                    tiles[x, y].Type = TileType.Empty;
+                    tiles[x, y].Type = TileType.Ground;
                 }
                 else {
                     tiles[x, y].Type = TileType.Floor;
@@ -52,6 +53,7 @@ public class World {
             }
         }
     }
+    */
 
     // Returns the Tile object for a given coordinate.
     public Tile GetTileAt(int x, int y) {
@@ -62,7 +64,7 @@ public class World {
 
         return tiles[x, y];
     }
-    
+
     public void PlaceInstalledObject(InstalledObjectType installedObjectType, Tile tile) {
         if (installedObjectPrototypes.TryGetValue(installedObjectType, out var installedObject)) {
             InstalledObject obj = InstalledObject.PlacePrototype(installedObject, tile);
