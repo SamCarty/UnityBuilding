@@ -13,10 +13,12 @@ public class BuildModeController : MonoBehaviour {
             // Check legality of placing InstalledObject here.
             if (InstalledObject.CheckPlacementValidity(buildModeInstalledObjectType, tile)) {
                 // Create the InstalledObject as a new pending Job.
+                
+                WorldController.instance.world.PlaceInstalledObject(buildModeInstalledObjectType, tile);
+                
                 Job job = new Job(tile,
                     (j) => {
-                        WorldController.instance.world.PlaceInstalledObject(
-                            buildModeInstalledObjectType, tile);
+                         tile.installedObject.SetInstalled(true);
                     });
 
                 // TODO: probably should move to somewhere else, too easy to forget to do this!!
@@ -25,8 +27,9 @@ public class BuildModeController : MonoBehaviour {
                 job.RegisterJobCancelCallback(j => { tile.pendingInstalledObjectJob = null; });
                                 
                 // Add the job to the World's job queue.
-                WorldController.instance.world.jobs.Enqueue(job);
-                Debug.Log("Job queue size: " + WorldController.instance.world.jobs.Count);
+                WorldController.instance.world.jobQueue.Enqueue(job);
+
+                Debug.Log("Job queue size: " + WorldController.instance.world.jobQueue.Count());
             }
         }
 

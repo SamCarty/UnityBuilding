@@ -25,17 +25,21 @@ public class InstalledObject {
     // Whether the InstalledObject connects to its neighbour (e.g. a wall for it's sprite to change.
     public bool linksToNeighbour { get; protected set; }
     
+    // Whether the InstalledObject is actually installed on a Tile (or is queued up to be installed!).
+    public bool installed { get; protected set; }
+
     // Callback for when the status changes.
     Action<InstalledObject> cbChanged;
 
-    public static InstalledObject CreatePrototype(InstalledObjectType installedObjectType, float movementCost, 
-        bool linksToNeighbour = false, int width = 1, int height = 1) {
+    public static InstalledObject CreatePrototype(InstalledObjectType installedObjectType, float movementCost,
+        bool linksToNeighbour = false, int width = 1, int height = 1, bool installed = false) {
         InstalledObject installedObject = new InstalledObject();
         installedObject.installedObjectType = installedObjectType;
         installedObject.linksToNeighbour = linksToNeighbour;
         installedObject.width = width;
         installedObject.height = height;
         installedObject.movementCost = movementCost;
+        installedObject.installed = installed;
         return installedObject;
     }
 
@@ -50,6 +54,7 @@ public class InstalledObject {
         installedObject.width = proto.width;
         installedObject.height = proto.height;
         installedObject.movementCost = proto.movementCost;
+        installedObject.installed = proto.installed;
         installedObject.tile = tile;
 
         // TODO: This assumes that the object is a 1x1 object.
@@ -119,6 +124,11 @@ public class InstalledObject {
         }
     }
 
+    public void SetInstalled(bool installed) {
+        this.installed = installed;
+        if (cbChanged != null) cbChanged?.Invoke(this);
+    }
+    
     public void RegisterChanged(Action<InstalledObject> callback) {
         cbChanged += callback;
     }

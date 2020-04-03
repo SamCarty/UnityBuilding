@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 public class Job
 {
@@ -7,19 +8,19 @@ public class Job
 
     Tile tile;
     float jobTime;
-
+    
     Action<Job> cbJobComplete;
     Action<Job> cbJobCancel;
 
-    public Job(Tile tile, Action<Job> cbJobComplete, float jobTime = 1f) {
+    public Job(Tile tile, Action<Job> cbJobComplete, float jobTime = 3f) {
         this.tile = tile;
         this.jobTime = jobTime;
         this.cbJobComplete = cbJobComplete;
-        Work(2.0f);
     }
-
+    
     public void Work(float workTime) {
         jobTime -= workTime;
+        Debug.Log(jobTime);
 
         if (jobTime <= 0) {
             cbJobComplete?.Invoke(this);

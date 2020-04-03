@@ -44,8 +44,8 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         switch (placedObject.installedObjectType) {
             case InstalledObjectType.Wall:
                 SpriteRenderer spriteRenderer = installedObjectGameObject.GetComponent<SpriteRenderer>();
-                spriteRenderer.sprite = GetSpriteForInstalledObject(placedObject);
-                spriteRenderer.sortingLayerName = "InstalledObject";
+                    spriteRenderer.sprite = GetSpriteForInstalledObject(placedObject);
+                    spriteRenderer.sortingLayerName = "InstalledObject";
                 break;
             default:
                 Debug.LogError("OnInstalledObjectPlaced - Invalid InstalledObject type.");
@@ -56,7 +56,7 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         placedObject.RegisterChanged(OnInstalledObjectChanged);
     }
 
-    Sprite GetSpriteForInstalledObject(InstalledObject obj) {
+    public Sprite GetSpriteForInstalledObject(InstalledObject obj) {
         // if the object does not link to the neighbour, just get the sprite by the ObjectType...
         if (obj.linksToNeighbour == false) {
             return installedObjectSprites[obj.installedObjectType.ToString()];
@@ -64,6 +64,16 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
         // ...otherwise, the sprite will have a more complex name!
         string spriteName = obj.installedObjectType + "_";
+
+        if (obj.installed == false) {
+            Debug.Log("Object not yet installed...");
+            spriteName += "Placeholder";
+            // TODO remove code duplication
+            if (installedObjectSprites.TryGetValue(spriteName, out var s)) {
+                return s;
+            }
+        }
+        
         int x = obj.tile.x;
         int y = obj.tile.y;
 
