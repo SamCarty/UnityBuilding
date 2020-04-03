@@ -40,12 +40,18 @@ public class InstalledObjectSpriteController : MonoBehaviour {
         installedObjectGameObjectMap.Add(placedObject, installedObjectGameObject);
 
         // Add a SpriteRenderer to the InstalledObject.
-        installedObjectGameObject.AddComponent<SpriteRenderer>();
+        SpriteRenderer spriteRenderer = installedObjectGameObject.AddComponent<SpriteRenderer>();
+        if (!placedObject.installed) {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.3f);
+        }
+        else {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        }
+
         switch (placedObject.installedObjectType) {
             case InstalledObjectType.Wall:
-                SpriteRenderer spriteRenderer = installedObjectGameObject.GetComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = GetSpriteForInstalledObject(placedObject);
-                    spriteRenderer.sortingLayerName = "InstalledObject";
+                spriteRenderer.sprite = GetSpriteForInstalledObject(placedObject);
+                spriteRenderer.sortingLayerName = "InstalledObject";
                 break;
             default:
                 Debug.LogError("OnInstalledObjectPlaced - Invalid InstalledObject type.");
@@ -67,7 +73,6 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
         if (obj.installed == false) {
             Debug.Log("Object not yet installed...");
-            spriteName += "Placeholder";
             // TODO remove code duplication
             if (installedObjectSprites.TryGetValue(spriteName, out var s)) {
                 return s;
@@ -116,8 +121,19 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
     void OnInstalledObjectChanged(InstalledObject installedObject) {
         // Make sure the InstalledObject graphics are updated when an adjacent thing is added.
+        if (!installedObject.installed) return;
+        
         if (installedObjectGameObjectMap.TryGetValue(installedObject, out var obj)) {
             SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+            
+            // TODO remove duplication with the OnInstalledObjectPlaced method.
+            if (!installedObject.installed) {
+                spriteRenderer.color = new Color(1f, 1f, 1f, 0.3f);
+            }
+            else {
+                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            }
+            
             spriteRenderer.sprite = GetSpriteForInstalledObject(installedObject);
             spriteRenderer.sortingLayerName = "InstalledObject";
         }
