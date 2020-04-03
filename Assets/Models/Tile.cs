@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 // The base type of a tile for example, grass or concrete.
 public enum TileType {

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Job
 {
@@ -18,6 +15,7 @@ public class Job
         this.tile = tile;
         this.jobTime = jobTime;
         this.cbJobComplete = cbJobComplete;
+        Work(2.0f);
     }
 
     public void Work(float workTime) {

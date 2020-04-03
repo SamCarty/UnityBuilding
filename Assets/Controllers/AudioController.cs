@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AudioController : MonoBehaviour {
     private const float MAX_AUDIO_COOLDOWN = 0.1f;
