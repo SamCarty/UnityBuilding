@@ -40,7 +40,7 @@ public class InstalledObject {
         return installedObject;
     }
 
-    public InstalledObject PlacePrototype(InstalledObject proto, Tile tile) {
+    public static InstalledObject PlacePrototype(InstalledObject proto, Tile tile) {
         if (!CheckPlacementValidity(tile)) {
             return null;
         }
@@ -59,42 +59,12 @@ public class InstalledObject {
             return null;
         }
 
-        if (installedObject.linksToNeighbour) {
-            // Inform the neighbours that we have been added so they can update their own graphics.
-            // Trigger the OnInstalledObjectChanged callback.
-            Tile t;
-            int x = tile.x;
-            int y = tile.y;
-
-            t = tile.world.GetTileAt(x, y + 1);
-            if (t != null && t.installedObject != null &&
-                t.installedObject.installedObjectType == installedObject.installedObjectType) {
-                t.installedObject.cbChanged(t.installedObject);
-            }
-
-            t = tile.world.GetTileAt(x, y - 1);
-            if (t != null && t.installedObject != null &&
-                t.installedObject.installedObjectType == installedObject.installedObjectType) {
-                t.installedObject.cbChanged(t.installedObject);
-            }
-
-            t = tile.world.GetTileAt(x + 1, y);
-            if (t != null && t.installedObject != null &&
-                t.installedObject.installedObjectType == installedObject.installedObjectType) {
-                t.installedObject.cbChanged(t.installedObject);
-            }
-
-            t = tile.world.GetTileAt(x - 1, y);
-            if (t != null && t.installedObject != null &&
-                t.installedObject.installedObjectType == installedObject.installedObjectType) {
-                t.installedObject.cbChanged(t.installedObject);
-            }
-        }
+        InformNeighbours(installedObject);
 
         return installedObject;
     }
 
-    public bool CheckPlacementValidity(Tile tile) {
+    public static bool CheckPlacementValidity(Tile tile) {
         if (tile.tileType != TileType.Floor) {
             Debug.LogError("CheckPlacementValidity - Tried to place InstalledObject on area with no foundation.");
             return false;
@@ -106,6 +76,40 @@ public class InstalledObject {
         }
 
         return true;
+    }
+
+    public static void InformNeighbours(InstalledObject installedObject) {
+        if (installedObject.linksToNeighbour) {
+            // Inform the neighbours that we have been added so they can update their own graphics.
+            // Trigger the OnInstalledObjectChanged callback.
+            Tile t;
+            int x = installedObject.tile.x;
+            int y = installedObject.tile.y;
+
+            t = installedObject.tile.world.GetTileAt(x, y + 1);
+            if (t != null && t.installedObject != null &&
+                t.installedObject.installedObjectType == installedObject.installedObjectType) {
+                t.installedObject.cbChanged(t.installedObject);
+            }
+
+            t = installedObject.tile.world.GetTileAt(x, y - 1);
+            if (t != null && t.installedObject != null &&
+                t.installedObject.installedObjectType == installedObject.installedObjectType) {
+                t.installedObject.cbChanged(t.installedObject);
+            }
+
+            t = installedObject.tile.world.GetTileAt(x + 1, y);
+            if (t != null && t.installedObject != null &&
+                t.installedObject.installedObjectType == installedObject.installedObjectType) {
+                t.installedObject.cbChanged(t.installedObject);
+            }
+
+            t = installedObject.tile.world.GetTileAt(x - 1, y);
+            if (t != null && t.installedObject != null &&
+                t.installedObject.installedObjectType == installedObject.installedObjectType) {
+                t.installedObject.cbChanged(t.installedObject);
+            }
+        }
     }
 
     public void RegisterChanged(Action<InstalledObject> callback) {
