@@ -14,8 +14,7 @@ public class MouseController : MonoBehaviour {
     private Vector3 currentFramePos;
 
     // Dragging to place Tiles/Objects
-    [SerializeField]
-    private GameObject cursorPrefab;
+    [SerializeField] private GameObject cursorPrefab;
     private Vector3 dragStartPos;
     private List<GameObject> dragPreviewObjects;
 
@@ -97,9 +96,26 @@ public class MouseController : MonoBehaviour {
                         if (buildModeIsObjects) {
                             // Create the InstalledObject and assign it to the designated Tile.
 
-                            // TODO: Right now, we assume walls!
-                            WorldController.instance.world.PlaceInstalledObject(buildModeInstalledObjectType, tile);
+                            // Check legality of placing InstalledObject here.
+                            if (InstalledObject.CheckPlacementValidity(buildModeInstalledObjectType, tile)) {
+                                // Create the InstalledObject as a new pending Job.
+                                Job job = new Job(tile,
+                                    (j) => {
+                                        WorldController.instance.world.PlaceInstalledObject(
+                                            buildModeInstalledObjectType, tile);
+                                    });
+
+                                // TODO: probably should move to somewhere else, too easy to forget to do this!!
+                                tile.pendingInstalledObjectJob = job;
+                                
+                                job.RegisterJobCancelCallback(j => { tile.pendingInstalledObjectJob = null; });
+                                
+                                // Add the job to the World's job queue.
+                                WorldController.instance.world.jobs.Enqueue(job);
+                                Debug.Log("Job queue size: " + WorldController.instance.world.jobs.Count);
+                            }
                         }
+
                         else {
                             // We are in Tile changing mode, not object mode.
                             if (tile != null) tile.tileType = buildModeTile;
@@ -111,7 +127,7 @@ public class MouseController : MonoBehaviour {
     }
 
     void UpdateCameraMovement() {
-        // Drag camera around the scene.
+// Drag camera around the scene.
         if (Input.GetMouseButton(1)) {
             Vector3 diff = lastFramePos - currentFramePos;
             camera.transform.Translate(diff);
@@ -127,13 +143,14 @@ public class MouseController : MonoBehaviour {
     }
 
     public void SetModeBuildInstalledObject(string type) {
-        // Wall is not a TileType, it is an InstalledObject!
+// Wall is not a TileType, it is an InstalledObject!
         buildModeIsObjects = true;
 
-        // Try and get the Enum ObjectType from the passed in string (workaround as Unity does not allow Enums to be
-        // passed into script methods from the editor.
+// Try and get the Enum ObjectType from the passed in string (workaround as Unity does not allow Enums to be
+// passed into script methods from the editor.
         try {
-            InstalledObjectType objectType = (InstalledObjectType) System.Enum.Parse(typeof(InstalledObjectType), type);
+            InstalledObjectType objectType =
+                (InstalledObjectType) System.Enum.Parse(typeof(InstalledObjectType), type);
             buildModeInstalledObjectType = objectType;
         }
         catch (System.Exception) {

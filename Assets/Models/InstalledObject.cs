@@ -41,7 +41,7 @@ public class InstalledObject {
     }
 
     public static InstalledObject PlacePrototype(InstalledObject proto, Tile tile) {
-        if (!CheckPlacementValidity(tile)) {
+        if (!CheckPlacementValidity(proto.installedObjectType, tile)) {
             return null;
         }
         
@@ -59,19 +59,27 @@ public class InstalledObject {
             return null;
         }
 
+        tile.pendingInstalledObjectJob = null; // Get rid of the job.
         InformNeighbours(installedObject);
 
         return installedObject;
     }
 
-    public static bool CheckPlacementValidity(Tile tile) {
+    // TODO: maybe move these methods to some static class?
+    public static bool CheckPlacementValidity(InstalledObjectType type, Tile tile) {
+        // TODO support different InstallObjectTypes
         if (tile.tileType != TileType.Floor) {
             Debug.LogError("CheckPlacementValidity - Tried to place InstalledObject on area with no foundation.");
             return false;
         }
-
+        
         if (tile.installedObject != null) {
             Debug.LogError("CheckPlacementValidity - Tried to place InstalledObject over an existing object.");
+            return false;
+        }
+
+        if (tile.pendingInstalledObjectJob != null) {
+            Debug.LogError("CheckPlacementValidity - Tried to place InstalledObject over an a queued job.");
             return false;
         }
 

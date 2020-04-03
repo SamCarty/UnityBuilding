@@ -12,6 +12,7 @@ public class Tile {
     public int y;
     public LooseObject looseObject { get; protected set; }
     public InstalledObject installedObject { get; protected set; }
+    public Job pendingInstalledObjectJob;
     public World world { get; protected set; }
 
     private TileType tt = TileType.Ground;

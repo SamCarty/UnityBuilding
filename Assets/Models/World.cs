@@ -15,6 +15,9 @@ public class World {
     Action<InstalledObject> cbInstalledObjectPlaced;
     Action<Tile> cbTileTypeChanged;
 
+    // TODO replace with some dedicated class. For now this is just a public variable.
+    public Queue<Job> jobs;
+
     // Constructor
     public World(int width = 100, int height = 100) {
         this.width = width;
@@ -32,6 +35,8 @@ public class World {
 
         Debug.Log("World generated with " + tiles.Length + " tiles.");
 
+        jobs = new Queue<Job>();
+        
         CreateInstalledObjectPrototypes();
     }
 
