@@ -46,6 +46,22 @@ public class Tile {
         return true;
     }
 
+    public bool IsNeighbour(Tile tile, bool includeDiagonals) {
+        if (x == tile.x && (y == tile.y + 1 || y == tile.y - 1) ||
+            y == tile.y && (x == tile.x + 1 || x == tile.x - 1)) {
+            return true;
+        }
+
+        if (includeDiagonals) {
+            if (x == tile.x + 1 && (y == tile.y + 1 || y == tile.y - 1) ||
+                x == tile.x - 1 && (y == tile.y - 1 || y == tile.y + 1)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void RegisterTileTypeChangedCallback(Action<Tile> callback) {
         cbTileTypeChanged += callback;
     }

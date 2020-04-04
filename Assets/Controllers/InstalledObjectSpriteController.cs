@@ -7,23 +7,25 @@ public class InstalledObjectSpriteController : MonoBehaviour {
 
     // Map of all InstalledObjects logic elements and their corresponding GameObject in the editor.
     Dictionary<InstalledObject, GameObject> installedObjectGameObjectMap;
-
     Dictionary<string, Sprite> installedObjectSprites;
 
     // Start is called before the first frame update.
     void Start() {
-        installedObjectSprites = new Dictionary<string, Sprite>();
-
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/InstalledObjects/");
-        foreach (Sprite sprite in sprites) {
-            installedObjectSprites.Add(sprite.name, sprite);
-        }
+        LoadSpritesFromFile();
 
         // Initialize map that tracks the GameObject that is representing the InstalledObject data.
         installedObjectGameObjectMap = new Dictionary<InstalledObject, GameObject>();
         
         // Register our callback events
         world.RegisterInstalledObjectPlaced(OnInstalledObjectPlaced);
+    }
+
+    void LoadSpritesFromFile() {
+        installedObjectSprites = new Dictionary<string, Sprite>();
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/InstalledObjects/");
+        foreach (Sprite sprite in sprites) {
+            installedObjectSprites.Add(sprite.name, sprite);
+        }
     }
 
     public void OnInstalledObjectPlaced(InstalledObject placedObject) {

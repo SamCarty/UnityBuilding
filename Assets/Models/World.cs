@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class World {
     // Array of all the tiles in the world.
-    public Tile[,] tiles { get; protected set; }
+    Tile[,] tiles;
+    List<Character> characters;
 
     Dictionary<InstalledObjectType, InstalledObject> installedObjectPrototypes;
 
@@ -13,6 +14,7 @@ public class World {
 
     Action<InstalledObject> cbInstalledObjectPlaced;
     Action<Tile> cbTileTypeChanged;
+    Action<Character> cbCharacterPlaced;
 
     public JobQueue jobQueue;
 
@@ -38,10 +40,24 @@ public class World {
         CreateInstalledObjectPrototypes();
     }
 
+    // Handles the movement and overall running of the game World.
+    public void Simulate(float deltaTime) {
+        foreach (var character in characters) {
+            character.Move(deltaTime);
+        }
+    }
+
     void CreateInstalledObjectPrototypes() {
         installedObjectPrototypes = new Dictionary<InstalledObjectType, InstalledObject>();
         installedObjectPrototypes.Add(InstalledObjectType.Wall, InstalledObject.CreatePrototype(
             InstalledObjectType.Wall, 0, true, width: 1, height: 1));
+    }
+
+    public void CreateCharacters() {
+        characters = new List<Character>();
+        Character character = new Character(tiles[width / 2, height / 2]);
+        cbCharacterPlaced?.Invoke(character);
+        characters.Add(character);
     }
 
     // Randomizes the tile type of each tile in the world.
@@ -82,6 +98,14 @@ public class World {
             Debug.LogError("World - installedObjectPrototypes does not contain the prototype Installed Object" +
                            " for " + installedObjectType);
         }
+    }
+    
+    public void RegisterCharacterPlaced(Action<Character> callback) {
+        cbCharacterPlaced += callback;
+    }
+
+    public void UnregisterCharacterPlaced(Action<Character> callback) {
+        cbCharacterPlaced -= callback;
     }
 
     public void RegisterInstalledObjectPlaced(Action<InstalledObject> callback) {
