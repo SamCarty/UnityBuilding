@@ -44,7 +44,7 @@ public class World {
     // Handles the movement and overall running of the game World.
     public void Simulate(float deltaTime) {
         foreach (var character in characters) {
-            character.Move(deltaTime);
+            character.Update(deltaTime);
         }
     }
 

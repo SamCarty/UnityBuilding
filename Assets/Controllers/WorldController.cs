@@ -30,12 +30,6 @@ public class WorldController : MonoBehaviour {
     
     void Update() {
         // TODO add pause, speed controls etc.
-        
-        // TODO this is for testing the job system works, to be removed after!
-        foreach (Job job in world.jobQueue.jobs) {
-            job.Work(Time.deltaTime);
-        }
-        
         world.Simulate(Time.deltaTime);
     }
     

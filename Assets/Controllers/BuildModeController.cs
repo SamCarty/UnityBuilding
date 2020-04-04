@@ -28,8 +28,6 @@ public class BuildModeController : MonoBehaviour {
                                 
                 // Add the job to the World's job queue.
                 WorldController.instance.world.jobQueue.Enqueue(job);
-
-                Debug.Log("Job queue size: " + WorldController.instance.world.jobQueue.Count());
             }
         }
 

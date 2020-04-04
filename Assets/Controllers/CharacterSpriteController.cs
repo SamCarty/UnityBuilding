@@ -20,7 +20,6 @@ public class CharacterSpriteController : MonoBehaviour {
         
         // TODO: For debug only
         Character character = world.CreateCharacter(world.GetTileAt(world.width / 2, world.height / 2));
-        character.SetDestination(world.GetTileAt(world.width / 2 + 5, world.height / 2));
         character.RegisterMovedCallback(OnCharacterMoved);
     }
 

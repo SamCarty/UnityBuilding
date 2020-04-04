@@ -11,6 +11,8 @@ public class Character {
     float movementProgressPercentage;
     float speed;
 
+    Job job;
+
     Action<Character> cbMoved;
 
     public Character(Tile spawnTile, float speed = 3) {
@@ -18,9 +20,26 @@ public class Character {
         this.speed = speed;
     }
 
-    public void Move(float deltaTime) {
+    public void Update(float deltaTime) {
+        
+        // Get a new job if we don't have one yet...
+        if (job == null) {
+            // Try and get a job from the JobQueue (if there is one available).
+            job = currentTile.world.jobQueue.Dequeue();
+
+            if (job != null) {
+                // We now have a new job.
+                destinationTile = job.tile;
+                job.RegisterJobCancelCallback(OnJobEnded);
+                job.RegisterJobCompleteCallback(OnJobEnded);
+            }
+        }
+        
         // Check if we have already arrived at the Tile
         if (currentTile == destinationTile) {
+            if (job != null) {
+                job.Work(deltaTime);
+            }
             return;
         }
         
@@ -53,6 +72,14 @@ public class Character {
 
         this.destinationTile = destinationTile;
     }
+    
+    void OnJobEnded(Job job) {
+        if (this.job != job) {
+            Debug.Log("OnJobEnded - Character is being told about a job other than it's own. Something was probably not Unregistered properly!");
+        }
+
+        this.job = null;
+    }
 
     public void RegisterMovedCallback(Action<Character> callback) {
         cbMoved += callback;
@@ -61,5 +88,5 @@ public class Character {
     public void UnregisterMovedCallback(Action<Character> callback) {
         cbMoved -= callback;
     }
-    
+
 }

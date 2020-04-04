@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class JobQueue {
     
@@ -14,7 +15,19 @@ public class JobQueue {
 
     public void Enqueue(Job job) {
         jobs.Enqueue(job);
+        Debug.Log("JobQueue size is now: " + WorldController.instance.world.jobQueue.Count());
+        
         cbJobCreated?.Invoke(job);
+    }
+
+    public Job Dequeue() {
+        if (jobs.Count == 0) {
+            Debug.Log("Job queue is empty!");
+            return null;
+        }
+        
+        Debug.Log("JobQueue size is now: " + (WorldController.instance.world.jobQueue.Count() - 1));
+        return jobs.Dequeue();
     }
 
     public int Count() {

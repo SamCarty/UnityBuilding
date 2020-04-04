@@ -6,13 +6,13 @@ public class Job
     // Holds information about a queued job, which includes placing InstalledObject, moving LooseObjects,
     // working at a research bench etc.
 
-    Tile tile;
+    public Tile tile { get; protected set; }
     float jobTime;
     
     Action<Job> cbJobComplete;
     Action<Job> cbJobCancel;
 
-    public Job(Tile tile, Action<Job> cbJobComplete, float jobTime = 3f) {
+    public Job(Tile tile, Action<Job> cbJobComplete, float jobTime = 1f) {
         this.tile = tile;
         this.jobTime = jobTime;
         this.cbJobComplete = cbJobComplete;
@@ -20,7 +20,6 @@ public class Job
     
     public void Work(float workTime) {
         jobTime -= workTime;
-        Debug.Log(jobTime);
 
         if (jobTime <= 0) {
             cbJobComplete?.Invoke(this);
