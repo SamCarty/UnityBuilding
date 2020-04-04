@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Character {
 
@@ -10,14 +11,14 @@ public class Character {
     float movementProgressPercentage;
     float speed;
 
-    public Character(Tile spawnTile, float speed = 5) {
+    Action<Character> cbMoved;
+
+    public Character(Tile spawnTile, float speed = 3) {
         this.currentTile = this.destinationTile = spawnTile;
         this.speed = speed;
     }
 
     public void Move(float deltaTime) {
-        Debug.Log("Character update method called...");
-        
         // Check if we have already arrived at the Tile
         if (currentTile == destinationTile) {
             return;
@@ -39,9 +40,10 @@ public class Character {
         if (movementProgressPercentage >= 1) {
             // Destination reached!
             movementProgressPercentage = 0;
+            currentTile = destinationTile;
         }
 
-        currentTile = WorldController.instance.world.GetTileAt((int) x, (int) y);
+        cbMoved?.Invoke(this);
     }
 
     public void SetDestination(Tile destinationTile) {
@@ -50,9 +52,14 @@ public class Character {
         }
 
         this.destinationTile = destinationTile;
-
     }
-    
-    
+
+    public void RegisterMovedCallback(Action<Character> callback) {
+        cbMoved += callback;
+    }
+
+    public void UnregisterMovedCallback(Action<Character> callback) {
+        cbMoved -= callback;
+    }
     
 }

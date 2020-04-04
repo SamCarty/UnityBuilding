@@ -24,6 +24,7 @@ public class World {
         this.height = height;
 
         tiles = new Tile[width + 1, height + 1];
+        characters = new List<Character>();
 
         // Loop through for height and width to create array of tiles.
         for (int x = 0; x < width; x++) {
@@ -36,7 +37,7 @@ public class World {
         Debug.Log("World generated with " + tiles.Length + " tiles.");
 
         jobQueue = new JobQueue();
-
+        
         CreateInstalledObjectPrototypes();
     }
 
@@ -53,11 +54,11 @@ public class World {
             InstalledObjectType.Wall, 0, true, width: 1, height: 1));
     }
 
-    public void CreateCharacters() {
-        characters = new List<Character>();
-        Character character = new Character(tiles[width / 2, height / 2]);
+    public Character CreateCharacter(Tile startingTile) {
+        Character character = new Character(startingTile);
         cbCharacterPlaced?.Invoke(character);
         characters.Add(character);
+        return character;
     }
 
     // Randomizes the tile type of each tile in the world.

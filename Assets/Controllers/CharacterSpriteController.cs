@@ -19,7 +19,9 @@ public class CharacterSpriteController : MonoBehaviour {
         world.RegisterCharacterPlaced(OnCharacterPlaced);
         
         // TODO: For debug only
-        world.CreateCharacters();
+        Character character = world.CreateCharacter(world.GetTileAt(world.width / 2, world.height / 2));
+        character.SetDestination(world.GetTileAt(world.width / 2 + 5, world.height / 2));
+        character.RegisterMovedCallback(OnCharacterMoved);
     }
 
     void LoadSpritesFromFile() {
@@ -49,4 +51,14 @@ public class CharacterSpriteController : MonoBehaviour {
         //character.RegisterCharacterChanged(OnCharacterChanged);
     }
 
+    void OnCharacterMoved(Character character) {
+        // Make sure the InstalledObject graphics are updated when an adjacent thing is added.
+        if (characterGameObjectMap.TryGetValue(character, out var obj)) {
+            obj.transform.position = new Vector3(character.x, character.y, 0);
+        }
+        else {
+            Debug.LogError("OnCharacterMoved - Character is not present in the " +
+                           "characterGameObjectMap.");
+        }
+    }
 }
